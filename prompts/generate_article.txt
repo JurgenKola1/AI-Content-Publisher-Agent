@@ -1,0 +1,13 @@
+Create a complete Dev.to-ready technical article about this topic:
+
+{topic}
+
+Return only valid JSON with these fields:
+- title: a clear article title
+- subtitle: a short one-sentence description
+- body_markdown: the full article body in Markdown
+- tags: 1 to 4 Dev.to tags as lowercase strings
+
+The article should be helpful for beginners, practical, and ready to publish as a draft.
+Do not include images in the Markdown body — the app adds one image later.
+Do not include Markdown code fences around the JSON.

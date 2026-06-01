@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Publisher Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="page">
+        <section class="card hero">
+            <p class="eyebrow">Local AI Content Publisher Agent</p>
+            <h1>Create a Dev.to Draft</h1>
+            <p>
+                Enter a topic and the app will generate a title, subtitle,
+                Markdown article, Dev.to tags, and one AI illustration placed
+                at the most important paragraph. It saves a local draft first,
+                then sends the article to Dev.to as unpublished.
+            </p>
+
+            <form method="post" class="topic-form">
+                <input type="hidden" name="action" value="manual">
+                <label for="topic">Article topic (manual)</label>
+                <input
+                    id="topic"
+                    name="topic"
+                    type="text"
+                    placeholder="Example: How Flask routes work for beginners"
+                >
+                <button type="submit">Generate Draft</button>
+            </form>
+        </section>
+
+        <section class="card queue">
+            <p class="eyebrow">Automation</p>
+            <h2>Topic Queue</h2>
+            <p>
+                Topics are stored in <code>data/topics.json</code>. Add topics here,
+                then click <strong>Generate Next Draft</strong> to process the
+                first unused topic automatically.
+            </p>
+
+            <form method="post" class="topic-form">
+                <input type="hidden" name="action" value="add_topic">
+                <label for="queue_topic">Add topic to queue</label>
+                <input
+                    id="queue_topic"
+                    name="queue_topic"
+                    type="text"
+                    placeholder="Example: 5 ways to automate blog writing with AI"
+                >
+                <button type="submit" class="btn-secondary">Add Topic</button>
+            </form>
+
+            <form method="post" class="generate-next-form">
+                <input type="hidden" name="action" value="generate_next">
+                <button type="submit">Generate Next Draft</button>
+            </form>
+
+            <div class="queue-lists">
+                <div class="queue-group">
+                    <h3>Unused ({{ queue_unused|length }})</h3>
+                    {% if queue_unused %}
+                        <ul>
+                            {% for item in queue_unused %}
+                                <li>
+                                    <span class="queue-id">#{{ item.id }}</span>
+                                    {{ item.topic }}
+                                    <span class="queue-date">{{ item.created_at }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="empty">No unused topics.</p>
+                    {% endif %}
+                </div>
+
+                <div class="queue-group">
+                    <h3>Used ({{ queue_used|length }})</h3>
+                    {% if queue_used %}
+                        <ul>
+                            {% for item in queue_used %}
+                                <li>
+                                    <span class="queue-id">#{{ item.id }}</span>
+                                    {{ item.topic }}
+                                    <span class="queue-date">Used {{ item.used_at }}</span>
+                                    {% if item.dev_url %}
+                                        <a href="{{ item.dev_url | devto_link }}" target="_blank">Open Dev.to dashboard</a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="empty">No used topics yet.</p>
+                    {% endif %}
+                </div>
+
+                <div class="queue-group">
+                    <h3>Failed ({{ queue_failed|length }})</h3>
+                    {% if queue_failed %}
+                        <ul>
+                            {% for item in queue_failed %}
+                                <li>
+                                    <span class="queue-id">#{{ item.id }}</span>
+                                    {{ item.topic }}
+                                    <span class="queue-error">{{ item.error }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="empty">No failed topics.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        {% if success %}
+            <section class="success">
+                {{ success }}
+            </section>
+        {% endif %}
+
+        {% if result and result.image_warning %}
+            <section class="warning">
+                <strong>Image note:</strong> {{ result.image_warning }}
+            </section>
+        {% endif %}
+
+        {% if error %}
+            <section class="alert">
+                <strong>Something went wrong:</strong> {{ error }}
+            </section>
+        {% endif %}
+
+        {% if result %}
+            <section class="card result">
+                <h2>{{ result.article.title }}</h2>
+                <p class="subtitle">{{ result.article.subtitle }}</p>
+
+                {% if result.queue_topic %}
+                    <p class="queue-note">
+                        From queue topic #{{ result.queue_topic.id }}:
+                        {{ result.queue_topic.topic }}
+                    </p>
+                {% endif %}
+
+                <div class="meta">
+                    <p><strong>Local draft:</strong> {{ result.draft_path }}</p>
+                    <p><strong>Dev.to draft ID:</strong> {{ result.devto_id or "Not created yet" }}</p>
+                    {% if result.devto_url %}
+                        <p>
+                            <strong>Dev.to:</strong>
+                            <a href="{{ result.devto_url }}" target="_blank">Open your drafts on Dev.to</a>
+                        </p>
+                        <p class="hint">
+                            Drafts live on your dashboard (Posts). Click <strong>Edit</strong> there.
+                            The API preview URL only works after you publish.
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div class="tags">
+                    {% for tag in result.article.tags %}
+                        <span>#{{ tag }}</span>
+                    {% endfor %}
+                </div>
+
+                {% if result.article.image_filename %}
+                    <h3>Generated Illustration</h3>
+                    <p class="hint">
+                        Placed after paragraph {{ result.article.image_paragraph_index + 1 }}
+                        — {{ result.article.image_alt }}
+                    </p>
+                    <img
+                        class="article-image"
+                        src="{{ url_for('serve_draft_image', filename=result.article.image_filename) }}"
+                        alt="{{ result.article.image_alt }}"
+                    >
+                {% endif %}
+
+                <h3>Generated Markdown</h3>
+                <pre>{{ result.article.body_markdown }}</pre>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

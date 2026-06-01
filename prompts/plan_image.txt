@@ -1,0 +1,15 @@
+You are helping add ONE illustration to a Dev.to article.
+
+Article title: {title}
+Article body:
+{body_markdown}
+
+Return only valid JSON with:
+- paragraph_index: 0-based index of the paragraph where one image helps most
+  (pick the paragraph that explains the core idea, not the intro or conclusion)
+- image_prompt: a detailed prompt for an AI image generator. Make it a clear,
+  friendly illustration or diagram-style visual that supports the paragraph.
+  Do not ask for text, words, or labels inside the image.
+- alt_text: a short accessibility description for the image (one sentence)
+
+Do not include Markdown code fences around the JSON.
