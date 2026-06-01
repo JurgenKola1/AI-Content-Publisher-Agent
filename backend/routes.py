@@ -2,13 +2,18 @@
 
 from flask import Flask, render_template, request, send_from_directory
 
-from backend.config import IMAGES_DIR
+from backend.config import IMAGES_DIR, ROOT_DIR
 from backend.publisher import dev_url_for_display, process_next_queued_topic, publish_topic
 from backend.topics import add_topic_to_queue, topics_by_status
 
 
 def create_app():
-    app = Flask(__name__)
+    # Templates and static files live at project root, not inside backend/
+    app = Flask(
+        __name__,
+        template_folder=str(ROOT_DIR / "templates"),
+        static_folder=str(ROOT_DIR / "static"),
+    )
 
     @app.template_filter("devto_link")
     def devto_link_filter(url):

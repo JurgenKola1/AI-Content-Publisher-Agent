@@ -2,12 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>AI Content Publisher Agent</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <main class="page">
+        <header class="site-header">
+            <p class="header-title">AI Content Publisher Agent</p>
+            <p class="powered-by">
+                Powered by <span class="brand">Master Menu LLC</span>
+            </p>
+        </header>
+
         <section class="card hero">
             <p class="eyebrow">Local AI Content Publisher Agent</p>
             <h1>Create a Dev.to Draft</h1>
@@ -27,7 +37,7 @@
                     type="text"
                     placeholder="Example: How Flask routes work for beginners"
                 >
-                <button type="submit">Generate Draft</button>
+                <button type="submit" class="btn-primary">Generate Draft</button>
             </form>
         </section>
 
@@ -49,12 +59,12 @@
                     type="text"
                     placeholder="Example: 5 ways to automate blog writing with AI"
                 >
-                <button type="submit" class="btn-secondary">Add Topic</button>
+                <button type="submit" class="btn-secondary btn-block-mobile">Add Topic</button>
             </form>
 
             <form method="post" class="generate-next-form">
                 <input type="hidden" name="action" value="generate_next">
-                <button type="submit">Generate Next Draft</button>
+                <button type="submit" class="btn-primary btn-block-mobile">Generate Next Draft</button>
             </form>
 
             <div class="queue-lists">
@@ -85,7 +95,7 @@
                                     {{ item.topic }}
                                     <span class="queue-date">Used {{ item.used_at }}</span>
                                     {% if item.dev_url %}
-                                        <a href="{{ item.dev_url | devto_link }}" target="_blank">Open Dev.to dashboard</a>
+                                        <a class="link-action" href="{{ item.dev_url | devto_link }}" target="_blank" rel="noopener noreferrer">Open Dev.to dashboard</a>
                                     {% endif %}
                                 </li>
                             {% endfor %}
@@ -150,7 +160,7 @@
                     {% if result.devto_url %}
                         <p>
                             <strong>Dev.to:</strong>
-                            <a href="{{ result.devto_url }}" target="_blank">Open your drafts on Dev.to</a>
+                            <a class="link-action" href="{{ result.devto_url }}" target="_blank" rel="noopener noreferrer">Open your drafts on Dev.to</a>
                         </p>
                         <p class="hint">
                             Drafts live on your dashboard (Posts). Click <strong>Edit</strong> there.
@@ -182,6 +192,12 @@
                 <pre>{{ result.article.body_markdown }}</pre>
             </section>
         {% endif %}
+
+        <footer class="site-footer">
+            <p class="powered-by">
+                Powered by <span class="brand">Master Menu LLC</span>
+            </p>
+        </footer>
     </main>
 </body>
 </html>
